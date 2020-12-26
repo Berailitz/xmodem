@@ -10,17 +10,21 @@ typedef struct {
     Linked *linked;
 } Allocator;
 
+/* 默认大小 */
+const uint ALLOCATOR_DEFAULT_HEIGHT;
+const uint ALLOCATOR_DEFAULT_WIDTH;
+
 /* 监控内存管理模块 */
 void allocator_print(const Allocator *const self, const LOG_LEVEL level);
 
 /* 创建模块 */
-Allocator *allocator_new(const uint height, const uint width);
+Allocator *allocator_new(uint height, uint width);
 
 /* 分配内存 */
 void *allocator_allocate(Allocator *const self, const uint size);
 
 /* 回收内存 */
-error allocator_deallocate(Allocator *const self, const void *const addr);
+error allocator_deallocate(Allocator *const self, void *const addr);
 
 /* 销毁模块 */
 error allocator_delete(Allocator *const self);

@@ -100,7 +100,7 @@ uint tpool_register(const callback_func callback, callback_param param, const ui
 
     pdebug("callback=%p param=%d timeout=%d interval=%d", callback, param, timeout, interval);
 
-    lock_lock(&tpool.timer_lock);
+//    lock_lock(&tpool.timer_lock);
     timer_idx = tpool_find_available_timer();
     if (timer_idx == TIMER_INVALID_ID) {
         pdebug("full");

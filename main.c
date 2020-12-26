@@ -1,8 +1,7 @@
-#include "timer_test.h"
+#include "xmodem_test.h"
 
 /* 主函数 */
 int main() {
-    srand(time(NULL));
-    timer_test();
+    xm_test();
     return 0;
 }

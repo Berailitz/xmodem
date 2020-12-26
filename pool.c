@@ -1,13 +1,16 @@
 #include "pool.h"
 
+/* 元数据的大小 */
+const uint POOL_META_SIZE = sizeof(PoolMeta);
+
 /* 空块，作为异常返回值 */
-Block EmptyBlock;
+Block EmptyBlock = {};
 
 /* 非法块的id，作为异常返回值 */
-const uint INVALID_BLOCK_ID;
+const uint INVALID_BLOCK_ID = ~(uint) 0;
 
 /* 块头的大小 */
-const uint BLOCK_HEADER_SIZE;
+const uint BLOCK_HEADER_SIZE = sizeof(((Block *) NULL)->header);
 
 /* 获取块的数据地址 */
 Block *pool_get_data(const Pool *self) {
@@ -132,7 +135,7 @@ uint pool_pointer_to_block_id(const Pool *const self, const void *const p) {
 Block *pool_pointer_to_block(const Pool *const self, const void *const addr) {
     const uint blockID = pool_pointer_to_block_id(self, addr);
     if (blockID == INVALID_BLOCK_ID) {
-        serror("invalid");
+        sinfo("invalid");
         return &EmptyBlock;
     } else {
         Block *const block = (Block *) (addr - BLOCK_HEADER_SIZE);
@@ -212,7 +215,7 @@ void *pool_allocate(Pool *const self, const uint size) {
     uint blockID = pool_find_available_block(self, numBlocks);
     sdebug("size=%d numBlocks=%d", size, numBlocks);
     if (blockID == INVALID_BLOCK_ID) {
-        serror("invalid");
+        sinfo("invalid");
         return NULL;
     } else {
         Block *const block = pool_block_id_to_block(self, blockID);
