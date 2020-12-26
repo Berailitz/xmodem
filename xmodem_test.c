@@ -9,5 +9,7 @@ error xm_test() {
     tpool_start();
     xmodem_run(&xm);
 
+    tpool_stop();
+
     return Success;
 }
