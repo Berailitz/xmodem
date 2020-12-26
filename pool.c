@@ -168,7 +168,6 @@ uint pool_find_available_block(const Pool *const self, const uint numBlocks) {
         } else {
             Block *const block = pool_block_id_to_block(self, i);
 
-            block_lock(block);
             if (block->header.size == 0) {
                 blocksFound++;
                 sdebug("available block=%p blocksFound=%d", block, blocksFound);
@@ -181,13 +180,11 @@ uint pool_find_available_block(const Pool *const self, const uint numBlocks) {
             } else {
                 usedLeft = block->header.size - 1;
                 sdebug("unavailable block=%p", block);
-                pool_unlock_blocks(self, i - blocksFound, blocksFound + 1);
                 blocksFound = 0;
             }
         }
     }
 
-    pool_unlock_blocks(self, i - blocksFound, blocksFound);
     sinfo("not match");
     return INVALID_BLOCK_ID;
 }
