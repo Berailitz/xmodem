@@ -12,6 +12,7 @@ void allocator_print(const Allocator *const self, const LOG_LEVEL level) {
 
 /* 创建模块 */
 Allocator *allocator_new(uint height, uint width) {
+    Allocator *self;
     if (height == 0) {
         height = ALLOCATOR_DEFAULT_HEIGHT;
     }
@@ -20,7 +21,7 @@ Allocator *allocator_new(uint height, uint width) {
         width = ALLOCATOR_DEFAULT_WIDTH;
     }
 
-    Allocator *self = malloc(sizeof(Allocator));
+    self = malloc(sizeof(Allocator));
     sinfo("new");
     self->pool = pool_new(height, width);
     self->linked = linked_new_empty();
