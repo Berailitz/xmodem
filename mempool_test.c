@@ -164,7 +164,7 @@ void *tester_cross(void *ii) {
         } else {
             tester_deallocate(self, ia, ps, ip);
         }
-        msleep(1);
+        msleep(1000);
     }
     free(ps);
     return NULL;
@@ -187,7 +187,7 @@ atest(9, {
         executor_start(&exes[ie], tester_cross, &TesterIs[ie]);
     }
 
-    sleep(2);
+    msleep(2000);
     /*for (ie = 0; ie < CONCURRENT_TASK_NUM; ie++) {
         executor_join(&exes[ie]);
     }*/
