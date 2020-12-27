@@ -7,6 +7,13 @@ error xmodem_init(xmodem *self) {
     return Success;
 }
 
+error xmodem_clear(xmodem *self) {
+    xm_channel_pair_clear(&self->pair);
+    xm_consumer_clear(&self->consumer);
+
+    return Success;
+}
+
 error xmodem_run(xmodem *self) {
     xm_consumer_start(&self->consumer);
     xm_producer_run(&self->producer);

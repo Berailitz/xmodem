@@ -34,6 +34,9 @@ error lock_lock(Lock *const self);
 /* 释放锁 */
 error lock_unlock(Lock *const self);
 
+/* 获取并释放锁 */
+error lock_reunlock(Lock *const self);
+
 /* 销毁锁 */
 error lock_delete(Lock *const self);
 

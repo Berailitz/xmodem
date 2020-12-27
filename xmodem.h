@@ -13,6 +13,8 @@ typedef struct {
 
 error xmodem_init(xmodem *self);
 
+error xmodem_clear(xmodem *self);
+
 error xmodem_run(xmodem *self);
 
 #define xm_test_base(name, test_block) \

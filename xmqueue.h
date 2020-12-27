@@ -43,9 +43,15 @@ typedef struct {
 
 error xm_queue_init(xm_queue *self);
 
+error xm_queue_clear(xm_queue *self);
+
 error xm_channel_init(xm_channel *self);
 
+error xm_channel_clear(xm_channel *self);
+
 error xm_channel_pair_init(xm_channel_pair *self);
+
+error xm_channel_pair_clear(xm_channel_pair *self);
 
 error xm_channel_register_receiver(xm_channel *self, xm_channel_receiver receiver, void *arg);
 

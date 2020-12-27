@@ -41,6 +41,18 @@ error lock_unlock(Lock *const self) {
     return Success;
 }
 
+/* 获取并释放锁 */
+error lock_reunlock(Lock *const self) {
+    error err;
+    err = lock_lock(self);
+    if (err != Success) {
+        return err;
+    }
+
+    err = lock_unlock(self);
+    return err;
+}
+
 /* 销毁锁 */
 error lock_delete(Lock *const self) {
 #ifdef __MINGW32__

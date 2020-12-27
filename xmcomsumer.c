@@ -1,8 +1,11 @@
 #include "xmcomsumer.h"
 
+const uint XM_MAX_NAK_COUNTER = 3;
+
 error xm_consumer_init(xm_consumer *self, xm_channel *channel) {
     self->channel = channel;
     self->nak_timer = 0;
+    self->nak_counter = 0;
     lock_init(&self->exit);
     lock_lock(&self->exit);
 
@@ -29,6 +32,11 @@ void *xm_consumer_nak_tick(void *arg) {
         return NULL;
     }
 
+    self->nak_counter++;
+    if (self->nak_counter > XM_MAX_NAK_COUNTER) {
+        lock_unlock(&self->exit);
+    }
+
     self->nak_timer = tpool_register(xm_consumer_nak_tick, self, 1, 0);
 
     return NULL;
@@ -43,4 +51,10 @@ void *xm_consumer_receive(void *arg, const uint length, const byte *data) {
     sinfo("%.*s", length, data);
 
     return NULL;
+}
+
+error xm_consumer_clear(xm_consumer *self) {
+    tpool_unregister(self->nak_timer);
+    lock_delete(&self->exit);
+    return Success;
 }

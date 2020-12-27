@@ -10,6 +10,12 @@ error xm_queue_init(xm_queue *self) {
     return Success;
 }
 
+error xm_queue_clear(xm_queue *self) {
+    lock_delete(&self->lock);
+
+    return Success;
+}
+
 error xm_channel_init(xm_channel *self) {
     xm_queue_init(&self->send_queue);
     xm_queue_init(&self->receive_queue);
@@ -29,12 +35,27 @@ error xm_channel_init(xm_channel *self) {
     return Success;
 }
 
+error xm_channel_clear(xm_channel *self) {
+    allocator_delete(self->allocator);
+    xm_queue_clear(&self->send_queue);
+    xm_queue_clear(&self->receive_queue);
+
+    return Success;
+}
+
 error xm_channel_pair_init(xm_channel_pair *self) {
     xm_channel_init(&self->producer);
     xm_channel_init(&self->consumer);
 
     self->consumer.counterpart = &self->producer;
     self->producer.counterpart = &self->consumer;
+
+    return Success;
+}
+
+error xm_channel_pair_clear(xm_channel_pair *self) {
+    xm_channel_clear(&self->consumer);
+    xm_channel_clear(&self->producer);
 
     return Success;
 }
