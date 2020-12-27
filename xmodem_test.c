@@ -1,15 +1,11 @@
 #include "xmodem_test.h"
 
-error xm_test() {
-    xmodem xm;
-
-    tpool_init();
-    xmodem_init(&xm);
-
+xm_test_base(1, {
     tpool_start();
     xmodem_run(&xm);
+})
 
-    tpool_stop();
-
+error xm_test() {
+    xm_test_1();
     return Success;
 }

@@ -3,6 +3,7 @@
 
 #include "xmproducer.h"
 #include "xmcomsumer.h"
+#include "test.h"
 
 typedef struct {
     xm_channel_pair pair;
@@ -13,5 +14,24 @@ typedef struct {
 error xmodem_init(xmodem *self);
 
 error xmodem_run(xmodem *self);
+
+#define xm_test_base(name, test_block) \
+error xm_test_##name() {               \
+    xmodem xm; \
+ \
+    plog_sep(level, "TEST "#name" START"); \
+ \
+    xmodem_init(&xm); \
+ \
+    tpool_start(); \
+ \
+    test_block \
+ \
+    tpool_stop(); \
+ \
+    plog_sep(level, "TEST "#name" END"); \
+ \
+    return Success; \
+}
 
 #endif //XMMODEM_H
