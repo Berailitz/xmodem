@@ -1,7 +1,9 @@
 #include "xmcomsumer.h"
 
+/* 最多发送多少个nak即停止 */
 const uint XM_MAX_NAK_COUNTER = 3;
 
+/* 初始化接收方 */
 error xm_consumer_init(xm_consumer *self, xm_channel *channel) {
     self->channel = channel;
     self->nak_timer = 0;
@@ -14,12 +16,14 @@ error xm_consumer_init(xm_consumer *self, xm_channel *channel) {
     return Success;
 }
 
+/* 启动接收方 */
 error xm_consumer_start(xm_consumer *self) {
     self->nak_timer = tpool_register(xm_consumer_nak_tick, self, 1, 0);
 
     return Success;
 }
 
+/* 超时发送nak的回调函数 */
 void *xm_consumer_nak_tick(void *arg) {
     xm_consumer *self = arg;
     error err;
@@ -42,6 +46,7 @@ void *xm_consumer_nak_tick(void *arg) {
     return NULL;
 }
 
+/* 接收方接受数据的回调函数 */
 void *xm_consumer_receive(void *arg, const uint length, const byte *data) {
     xm_consumer *self = arg;
 
@@ -53,6 +58,7 @@ void *xm_consumer_receive(void *arg, const uint length, const byte *data) {
     return NULL;
 }
 
+/* 销毁接收方 */
 error xm_consumer_clear(xm_consumer *self) {
     tpool_unregister(self->nak_timer);
     lock_delete(&self->exit);
