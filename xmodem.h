@@ -17,11 +17,11 @@ error xmodem_run(xmodem *self);
 
 #define xm_test_base(name, test_block) \
 error xm_test_##name() {               \
-    xmodem xm; \
+    xmodem self; \
  \
     plog_sep(level, "TEST "#name" START"); \
  \
-    xmodem_init(&xm); \
+    xmodem_init(&self); \
  \
     tpool_start(); \
  \

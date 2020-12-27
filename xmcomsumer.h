@@ -7,6 +7,7 @@
 typedef struct {
     xm_channel *channel;
     uint nak_timer;
+    Lock exit;
 } xm_consumer;
 
 error xm_consumer_init(xm_consumer *self, xm_channel *channel);

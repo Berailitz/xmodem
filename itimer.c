@@ -132,16 +132,17 @@ error tpool_unregister(const uint idx) {
 
     current = &tpool.timers[idx];
     lock_lock(&tpool.timer_lock);
+
     if (current->next == 0) {
         pinfo("empty");
-        lock_unlock(&tpool.timer_lock);
-        return Success;
     }
 
     current->next = 0;
     current->interval = 0;
     current->func = NULL;
     current->param = 0;
+
+    lock_unlock(&tpool.timer_lock);
     return Success;
 }
 

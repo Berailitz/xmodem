@@ -63,7 +63,7 @@ error xm_channel_send_data(xm_channel *self, uint size, const char *data) {
         xm_frame_dump(frame, (byte *) data + sent);
         xm_frame_gen_sum(frame);
 
-        sinfo("%.*s", length, data);
+        sinfo("frame=%p %.*s", frame, length, data + sent);
 
         lock_lock(&self->send_queue.lock);
 
@@ -105,7 +105,7 @@ error xm_channel_send_frame(xm_channel *self, xm_frame *frame) {
     self->resend_counter = 0;
     tpool_register(xm_package_resend_tick, (void *) package, 1, 0);
 
-    sinfo("channel=%p frame=%p", package->channel, package->frame);
+    sinfo("package=%p channel=%p frame=%p", package, package->channel, package->frame);
     xm_package_receive(package);
 
     return self->err;
@@ -114,30 +114,35 @@ error xm_channel_send_frame(xm_channel *self, xm_frame *frame) {
 void *xm_package_receive(void *arg) {
     xm_package *self = arg;
 
-    sinfo("flag=%d id=%d", self->frame->flag, self->frame->id);
+    sinfo("channel=%p flag=%d id=%d", self->channel, self->frame->flag, self->frame->id);
 
     if (self->frame->flag == XM_FLAG_SOH && xm_frame_check_sum(self->frame) != Success) {
         serror("mismatch");
 
         return NULL;
+    } else {
+        sinfo("match");
     }
 
     switch (self->frame->flag) {
         case XM_FLAG_SOH:
+            sinfo("SOH");
             xm_channel_send_flag(self->channel, XM_FLAG_ACK);
 
             if (self->channel->callback == NULL) {
+                sinfo("no callback");
                 return NULL;
             }
 
+            sinfo("callback");
             self->channel->callback(self->channel->arg, self->frame->length, xm_frame_load(self->frame));
 
             break;
         case XM_FLAG_ACK:
             sinfo("ack id=%d", self->channel->send_queue.next);
             self->channel->send_queue.next++;
-            lock_unlock(&self->channel->send_queue.lock);
             self->channel->counterpart->sent = NULL;
+            lock_unlock(&self->channel->send_queue.lock);
 
             break;
         case XM_FLAG_NAK:

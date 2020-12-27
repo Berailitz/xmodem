@@ -2,7 +2,12 @@
 
 xm_test_base(1, {
     tpool_start();
-    xmodem_run(&xm);
+    xmodem_run(&self);
+})
+
+xm_test_base(2, {
+    tpool_start();
+    xm_consumer_start(&self.consumer);
 })
 
 error xm_test() {
