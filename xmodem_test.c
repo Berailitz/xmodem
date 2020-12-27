@@ -3,8 +3,6 @@
 xm_test_base(1, {
     tpool_start();
     xmodem_run(&self);
-
-    xmodem_clear(&self);
 })
 
 xm_test_base(2, {
@@ -13,7 +11,14 @@ xm_test_base(2, {
     lock_reunlock(&self.consumer.exit);
 })
 
+xm_test_base(3, {
+    tpool_start();
+    xm_producer_run(&self.producer);
+})
+
 error xm_test() {
     xm_test_1();
+    xm_test_2();
+    xm_test_3();
     return Success;
 }
