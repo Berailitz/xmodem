@@ -23,7 +23,7 @@ typedef struct xm_channel {
     void *arg;
     xm_channel_receiver callback;
 
-    xm_frame *sent;
+    xm_frame_header *sent;
     uint resend_counter;
 
     error err;
@@ -38,7 +38,7 @@ typedef struct {
 
 typedef struct {
     xm_channel *channel;
-    xm_frame *frame;
+    xm_frame_header *frame;
 } xm_package;
 
 error xm_queue_init(xm_queue *self);
@@ -53,7 +53,7 @@ error xm_channel_send_data(xm_channel *self, uint size, const char *data);
 
 error xm_channel_send_flag(xm_channel *self, xm_flag flag);
 
-error xm_channel_send_frame(xm_channel *self, xm_frame *frame);
+error xm_channel_send_frame(xm_channel *self, xm_frame_header *frame);
 
 void *xm_package_receive(void *arg);
 

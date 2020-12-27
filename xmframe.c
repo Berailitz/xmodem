@@ -4,23 +4,36 @@
 
 const byte XM_FRAME_MAX_LENGTH = 128;
 
-error xm_frame_dump(xm_frame *self, byte* data) {
+xm_flag xm_frame_get_flag(xm_frame_header *self) {
+    return self->flag.flag;
+}
+
+error xm_frame_set_flag(xm_frame_header *self, xm_flag flag) {
+    self->flag.flag = flag;
+    return Success;
+}
+
+error xm_frame_dump(xm_frame_header *self, byte* data) {
     memcpy(xm_frame_load(self), data, self->length);
 
     return Success;
 }
 
-byte* xm_frame_load(xm_frame *self) {
-    return (byte*)self + sizeof(xm_frame);
+byte* xm_frame_load(xm_frame_header *self) {
+    return (byte*)self + sizeof(xm_frame_header);
 }
 
-error xm_frame_gen_sum(xm_frame *self) {
-    self->sum = xm_frame_calculate_sum(self);
+error xm_frame_gen_sum(xm_frame_header *self) {
+    *xm_frame_get_sum(self) = xm_frame_calculate_sum(self);
 
     return Success;
 }
 
-byte xm_frame_calculate_sum(xm_frame *self) {
+byte *xm_frame_get_sum(xm_frame_header *self) {
+    return xm_frame_load(self) + self->length;
+}
+
+byte xm_frame_calculate_sum(xm_frame_header *self) {
     byte *data = xm_frame_load(self);
     byte sum = 0;
     uint i;
@@ -31,11 +44,12 @@ byte xm_frame_calculate_sum(xm_frame *self) {
     return sum;
 }
 
-error xm_frame_check_sum(xm_frame *self) {
-    uint sum = xm_frame_calculate_sum(self);
+error xm_frame_check_sum(xm_frame_header *self) {
+    uint expected = xm_frame_calculate_sum(self);
+    uint received = *xm_frame_get_sum(self);
 
-    sdebug("expected=%d received=%d", sum, self->sum);
-    if (sum == self->sum) {
+    sdebug("expected=%d received=%d", expected, received);
+    if (expected == received) {
         return Success;
     }
 

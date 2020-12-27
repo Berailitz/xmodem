@@ -51,15 +51,15 @@ error xm_channel_send_data(xm_channel *self, uint size, const char *data) {
     uint sent;
 
     for (sent = 0; sent < size;) {
-        xm_frame *frame;
+        xm_frame_header *frame;
         uint length = size - sent;
         if (length > XM_FRAME_MAX_LENGTH) {
             length = XM_FRAME_MAX_LENGTH;
         }
 
-        frame = allocator_allocate(self->allocator, sizeof(xm_frame) + length);
+        frame = allocator_allocate(self->allocator, sizeof(xm_frame_header) + length + 1);
         frame->length = length;
-        frame->flag = XM_FLAG_SOH;
+        xm_frame_set_flag(frame, XM_FLAG_SOH);
         xm_frame_dump(frame, (byte *) data + sent);
         xm_frame_gen_sum(frame);
 
@@ -86,16 +86,16 @@ error xm_channel_send_data(xm_channel *self, uint size, const char *data) {
 }
 
 error xm_channel_send_flag(xm_channel *self, xm_flag flag) {
-    xm_frame *frame = allocator_allocate(self->allocator, sizeof(xm_frame));
-    frame->flag = flag;
+    xm_frame_header *frame = allocator_allocate(self->allocator, sizeof(xm_frame_flag));
+    xm_frame_set_flag(frame, flag);
     return xm_channel_send_frame(self, frame);
 }
 
-error xm_channel_send_frame(xm_channel *self, xm_frame *frame) {
+error xm_channel_send_frame(xm_channel *self, xm_frame_header *frame) {
     xm_package *package = allocator_allocate(self->allocator, sizeof(xm_package));
     sinfo("flag=%d", frame->flag);
 
-    if (frame->length > 0) {
+    if (xm_frame_get_flag(frame) == XM_FLAG_SOH) {
         frame->id = self->send_queue.next;
     }
 
@@ -116,7 +116,7 @@ void *xm_package_receive(void *arg) {
 
     sinfo("channel=%p flag=%d id=%d", self->channel, self->frame->flag, self->frame->id);
 
-    if (self->frame->flag == XM_FLAG_SOH && xm_frame_check_sum(self->frame) != Success) {
+    if (xm_frame_get_flag(self->frame) == XM_FLAG_SOH && xm_frame_check_sum(self->frame) != Success) {
         serror("mismatch");
 
         return NULL;
@@ -124,7 +124,7 @@ void *xm_package_receive(void *arg) {
         sinfo("match");
     }
 
-    switch (self->frame->flag) {
+    switch (xm_frame_get_flag(self->frame)) {
         case XM_FLAG_SOH:
             sinfo("SOH");
             xm_channel_send_flag(self->channel, XM_FLAG_ACK);

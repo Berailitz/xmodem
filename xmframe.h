@@ -17,19 +17,28 @@ const byte XM_FRAME_MAX_LENGTH;
 
 typedef struct {
     xm_flag flag;
+} xm_frame_flag;
+
+typedef struct {
+    xm_frame_flag flag;
     byte id;
     byte length;
-    byte sum;
-} xm_frame;
+} xm_frame_header;
 
-error xm_frame_dump(xm_frame *self, byte* data);
+xm_flag xm_frame_get_flag(xm_frame_header *self);
 
-byte* xm_frame_load(xm_frame *self);
+error xm_frame_set_flag(xm_frame_header *self, xm_flag flag);
 
-error xm_frame_gen_sum(xm_frame *self);
+error xm_frame_dump(xm_frame_header *self, byte* data);
 
-byte xm_frame_calculate_sum(xm_frame *self);
+byte* xm_frame_load(xm_frame_header *self);
 
-error xm_frame_check_sum(xm_frame *self);
+error xm_frame_gen_sum(xm_frame_header *self);
+
+byte *xm_frame_get_sum(xm_frame_header *self);
+
+byte xm_frame_calculate_sum(xm_frame_header *self);
+
+error xm_frame_check_sum(xm_frame_header *self);
 
 #endif //XMODEM_XMFRAME_H
